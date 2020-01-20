@@ -1,61 +1,51 @@
-module.exports =  class Calculator {
-  constuctor(...numbers) {
+module.exports = class Calculator {
+  constructor(...numbers) {
     this.numbers = numbers;
     this.results;
-    this.lastResults = 0;
-    this.setSlotArray = [];
-    this.getSlotArray = [];
+    this.slotRegex = /SLOT_/g;
+    this.Sliced;
+    this.resArray = [];
+    this.slotArray = [];
   }
   add(...numbers) {
     this.results = 0;
     for (var i = 0; i < numbers.length; i++) {
       if (numbers.includes("LAST")) {
-        for (var j = 1; j < numbers.length; j++) {
-          this.results = this.lastResults + numbers[j];
-        }
-      } else {
-        this.results += numbers[i];
+        numbers[0] = this.resArray[this.resArray.length - 1];
+      } else if (this.slotRegex.test(numbers[0]) == true) {
+        this.Sliced = numbers[0].slice(5, 6);
+        numbers[0] = this.slotArray[this.Sliced - 1];
       }
+      this.results += numbers[i];
     }
-    this.lastResults = this.results;
+    this.resArray.push(this.results);
     return this.results;
   }
+
   multiply(...numbers) {
     this.results = 1;
-    for (var j = 0; j < numbers.length; j++) {
-      if (numbers.includes("LAST")) {
-        for (var i = 1; i < numbers.length; i++) {
-          this.results = this.lastResults * numbers[i];
-        }
-      } else {
-        this.results *= numbers[j];
+    for (var i = 0; i < numbers.length; i++) {
+      if (numbers.includes("LAST"))
+        numbers[0] = this.resArray[this.resArray.length - 1];
+      else if (this.slotRegex.test(numbers[0]) == true) {
+        this.Sliced = numbers[0].slice(5, 6);
+        numbers[0] = this.slotArray[this.Sliced - 1];
       }
+      this.results *= numbers[i];
     }
-    this.lastResults = this.results;
-
+    this.resArray.push(this.results);
     return this.results;
   }
+
   last() {
-    return this.lastResults;
+    return this.resArray[this.resArray.length - 1];
   }
+
   set_slot(n) {
-    this.setSlotArray = [];
-    this.setSlotArray.push(this.lastResults);
+    n;
+    this.slotArray.push(this.results);
   }
   get_slot(n) {
-    this.setSlotArray;
-
-    for (var i = 0; i < this.setSlotArray.length; i++) {
-      var i = n - 1;
-    
-       this.setSlotArray[i];
-    }
-    return this.setSlotArray[i]
+    return this.slotArray[n - 1];
   }
-}
-// let cc = new Calculator();
-// cc.multiply(1, 2);
-// cc.add(2, 3);
-// console.log(cc.multiply("LAST", 3));
-// //console.log(cc.set_slot(0));
-// console.log(cc.get_slot(0));
+};
